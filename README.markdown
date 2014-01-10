@@ -1,5 +1,25 @@
 # Stay in Sync
 
+## About this fork
+
+This fork includes hooks support before and after updated src files compilation.
+To use hooks you should create a `sync_hooks.erl` file and export 2 functions: `before/1` and `'after'/1`
+
+```erlang
+-module(sync_hooks).
+-export([before/1, 'after'/1]).
+
+before("mymodule") ->
+	%% Do the stuff before "mymodule.erl" recompiled
+	ok;
+before(_File) -> ok.
+
+'after'("mymodule2") ->
+	%% Do the stuff after "mymodule2.erl" was recompiled
+	ok;
+'after'(_File) -> ok.
+```
+
 ## What is Sync?
 
 Sync is a developer utility. It recompiles and reloads your Erlang

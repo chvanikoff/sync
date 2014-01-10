@@ -331,7 +331,9 @@ process_src_file_lastmod([{File, LastMod}|T1], [{File, LastMod}|T2], EnablePatch
     process_src_file_lastmod(T1, T2, EnablePatching);
 process_src_file_lastmod([{File, _}|T1], [{File, _}|T2], EnablePatching) ->
     %% File has changed, recompile...
+    hook(before, File),
     recompile_src_file(File, EnablePatching),
+    hook('after', File),
     process_src_file_lastmod(T1, T2, EnablePatching);
 process_src_file_lastmod([{File1, LastMod1}|T1], [{File2, LastMod2}|T2], EnablePatching) ->
     %% Lists are different...
@@ -535,3 +537,9 @@ lisp_format(String0) ->
     Lines1 = string:tokens(String1, [$\n]),
     String2 = string:join(Lines1, "\\\" \\\""),
     lists:flatten(["\\\"", String2, "\\\""]).
+
+hook(Type, File) ->
+    case code:which(sync_hooks) of
+        non_existing -> ok;
+        _ -> sync_hooks:Type(filename:basename(File, ".erl"))
+    end.
